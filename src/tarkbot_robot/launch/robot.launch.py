@@ -35,12 +35,18 @@ def generate_launch_description():
             
     )
 
-#     bringup_robot_description = IncludeLaunchDescription(
-#             PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','robot_description.launch.py'))
-#     )
+    bringup_robot_description = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','robot_description.launch.py'))
+    )
+
+    bringup_rplidar = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('rplidar_ros')),'launch', 'rplidar_a2m8_launch.py')),
+    )
+
     ld.add_action(robot_base)
     ld.add_action(base_to_imu)
-#     ld.add_action(bringup_robot_description)
+    ld.add_action(bringup_robot_description)
+    ld.add_action(bringup_rplidar)
 
     return ld
 
