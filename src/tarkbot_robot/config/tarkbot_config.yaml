@@ -1,7 +1,7 @@
 tarkbot_robot_node:
   ros__parameters:
     #robot frame
-    base_frame: base_footprint    
+    base_frame: base_link    
     odom_frame: odom         
     imu_frame: imu_link      
 
@@ -14,7 +14,7 @@ tarkbot_robot_node:
     cmd_vel_topic: cmd_vel
     
     #config param
-    robot_port: /dev/ttyACM1    
+    robot_port: /dev/tarkbot
     pub_odom_tf: true
     akm_servo_offset: 120 
 
