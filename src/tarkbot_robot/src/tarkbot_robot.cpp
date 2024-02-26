@@ -44,7 +44,7 @@ TarkbotRobot::TarkbotRobot(
 {
 
     // this->declare_parameter<std::string>("odom_frame", "odom");
-    this->declare_parameter<std::string>("base_frame", "base_link");
+    // this->declare_parameter<std::string>("base_frame", "base_footprint");
     // this->declare_parameter<std::string>("imu_frame", "imu_link");
 
     // this->declare_parameter<std::string>("odom_topic", "odom");
@@ -58,7 +58,6 @@ TarkbotRobot::TarkbotRobot(
     //frame初始化
     this->get_parameter<std::string>("odom_frame",odom_frame_);
     this->get_parameter<std::string>("base_frame",base_frame_);
-    // base_frame_ = "base_link"
     this->get_parameter<std::string>("imu_frame",imu_frame_);
 
     //话题消息初始化
@@ -625,7 +624,6 @@ float invSqrt(float x)
 
     return y;
 }
-
 
 
 
