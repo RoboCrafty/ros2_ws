@@ -82,7 +82,7 @@ def generate_launch_description():
 
     ld = LaunchDescription()
 
-    ld.add_action(tarkbot_r20_twd)
+    ld.add_action(tarkbot_r20_fwd)
 
     return ld
 
