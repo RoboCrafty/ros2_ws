@@ -36,7 +36,7 @@ def generate_launch_description():
             package='tf2_ros', 
             executable='static_transform_publisher', 
             name='base_to_laser',
-            arguments=['0 ', '0', '0.06','0', '0','0','base_link','laser_link'],),
+            arguments=['-0.005 ', '0.02', '0.00','1.571', '0','2.8','base_link','laser_link'],),
         launch_ros.actions.Node(
             package='tf2_ros', 
             executable='static_transform_publisher', 
