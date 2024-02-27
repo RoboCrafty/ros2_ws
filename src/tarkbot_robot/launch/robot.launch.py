@@ -28,7 +28,7 @@ def generate_launch_description():
             output= 'screen',
             )
 
-    base_to_imu = launch_ros.actions.Node(
+    foot_to_base = launch_ros.actions.Node(
             package='tf2_ros', 
             executable='static_transform_publisher', 
             name='foot_to_base',
@@ -63,7 +63,7 @@ def generate_launch_description():
 #     )
 
     ld.add_action(robot_base)
-    ld.add_action(base_to_imu)
+    ld.add_action(foot_to_base)
 #     ld.add_action(bringup_robot_description)
     ld.add_action(bringup_robot_desc)
     ld.add_action(joint_pub)
