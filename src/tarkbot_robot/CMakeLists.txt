@@ -43,7 +43,7 @@ install(TARGETS
 )
 
 install(
-  DIRECTORY launch config meshes urdf
+  DIRECTORY launch config meshes urdf maps
   DESTINATION share/${PROJECT_NAME}
 )
 
