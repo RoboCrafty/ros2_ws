@@ -10,6 +10,8 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument,ExecuteProcess,IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -29,10 +31,13 @@ def generate_launch_description():
     base_to_imu = launch_ros.actions.Node(
             package='tf2_ros', 
             executable='static_transform_publisher', 
-            name='base_to_imu',
-            arguments=['0', '0', '0','0', '0','0','base_link','imu_link'],
-            output= 'screen',
+            name='foot_to_base',
+            arguments=['0 ', '0', '0.125','0', '0','0','base_footprint','base_link'],
+            )
             
+    joint_pub = launch_ros.actions.Node(
+            package='joint_state_publisher',
+            executable='joint_state_publisher',
     )
 
     bringup_robot_description = IncludeLaunchDescription(
@@ -41,11 +46,27 @@ def generate_launch_description():
 
     bringup_rplidar = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('rplidar_ros')),'launch', 'rplidar_a2m8_launch.py')),
-    )
+    )    
+
+    bringup_robot_desc = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('urdf_launch')),'launch','description.launch.py')),
+                launch_arguments={
+                'urdf_package': 'tarkbot_robot',
+                'urdf_package_path': PathJoinSubstitution(['urdf', 'tarkbot_model_v4.urdf'])}.items()
+                
+    )      
+#     bringup_robot_desc = IncludeLaunchDescription(
+#         PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'description.launch.py']),
+#         launch_arguments={
+#             'urdf_package': 'tarkbot_robot',
+#             'urdf_package_path': PathJoinSubstitution(['urdf', 'tarkbot_r20_fwd.urdf'])}.items()
+#     )
 
     ld.add_action(robot_base)
     ld.add_action(base_to_imu)
-    ld.add_action(bringup_robot_description)
+#     ld.add_action(bringup_robot_description)
+    ld.add_action(bringup_robot_desc)
+    ld.add_action(joint_pub)
     ld.add_action(bringup_rplidar)
 
     return ld

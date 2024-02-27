@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="tarkbot_model_v4">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.003841 -0.00011226 0.0015135"
+        rpy="0 0 0" />
+      <mass
+        value="1.3" />
+      <inertia
+        ixx="0.00055851"
+        ixy="-2.2359E-07"
+        ixz="-3.9351E-07"
+        iyy="0.0011421"
+        iyz="1.0586E-07"
+        izz="0.0016527" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.5 0.5 0.5 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="front_left_wheel">
+    <inertial>
+      <origin
+        xyz="2.8482E-07 0.022737 8.5654E-08"
+        rpy="0 0 0" />
+      <mass
+        value="0.25253" />
+      <inertia
+        ixx="0.00020889"
+        ixy="2.9924E-10"
+        ixz="8.7397E-11"
+        iyy="0.0003594"
+        iyz="8.9988E-11"
+        izz="0.00020889" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/front_left_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.03 0.03 0.03 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/front_left_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_left_joint"
+    type="continuous">
+    <origin
+      xyz="0.084 0.0777 -0.0145"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_left_wheel" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      effort="10"
+      velocity="60" />
+  </joint>
+  <link
+    name="front_right_wheel">
+    <inertial>
+      <origin
+        xyz="-2.0424E-07 -0.011718 -2.1621E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.25253" />
+      <inertia
+        ixx="0.00020889"
+        ixy="2.1458E-10"
+        ixz="1.582E-10"
+        iyy="0.0003594"
+        iyz="2.2715E-10"
+        izz="0.00020889" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/front_right_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.03 0.03 0.03 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/front_right_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="front_right_joint"
+    type="continuous">
+    <origin
+      xyz="0.084 -0.088718 -0.0145"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="front_right_wheel" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      effort="10"
+      velocity="60" />
+  </joint>
+  <link
+    name="rear_left_wheel">
+    <inertial>
+      <origin
+        xyz="2.079E-07 0.022737 -2.1269E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.25253" />
+      <inertia
+        ixx="0.00020889"
+        ixy="2.1843E-10"
+        ixz="-1.5841E-10"
+        iyy="0.0003594"
+        iyz="-2.2346E-10"
+        izz="0.00020889" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rear_left_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.03 0.03 0.03 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rear_left_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_left_joint"
+    type="continuous">
+    <origin
+      xyz="-0.084 0.0777 -0.0145"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rear_left_wheel" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      effort="10"
+      velocity="60" />
+  </joint>
+  <link
+    name="rear_right_wheel">
+    <inertial>
+      <origin
+        xyz="-1.8477E-07 -0.011718 -2.3307E-07"
+        rpy="0 0 0" />
+      <mass
+        value="0.25253" />
+      <inertia
+        ixx="0.00020889"
+        ixy="1.9412E-10"
+        ixz="1.5427E-10"
+        iyy="0.0003594"
+        iyz="2.4486E-10"
+        izz="0.00020889" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rear_right_wheel.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.03 0.03 0.03 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rear_right_wheel.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="rear_right_joint"
+    type="continuous">
+    <origin
+      xyz="-0.084 -0.088718 -0.0145"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="rear_right_wheel" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      effort="10"
+      velocity="60" />
+  </joint>
+
+  <link name="imu_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+
+  <link
+    name="laser_link">
+    <inertial>
+      <origin
+        xyz="-0.005 -0.02 0"
+        rpy="1.571 0 2.8" />
+      <mass
+        value="0.4" />
+      <inertia
+        ixx="0"
+        ixy="0"
+        ixz="0"
+        iyy="0"
+        iyz="0"
+        izz="0" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="-0.005 -0.02 0"
+        rpy="1.571 0 2.8" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rplidarA2.stl" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.05 0.05 0.05 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="-0.005 -0.02 0"
+        rpy="1.571 0 2.8" />
+      <geometry>
+        <mesh
+          filename="package://tarkbot_robot/meshes/meshesV2/rplidarA2.stl" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="camera_link">
+    <inertial>
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+      <mass value="0.0"/>
+      <inertia ixx="0.0" ixy="0.0" ixz="0.0" iyy="0.0" iyz="0.0" izz="0.0"/>
+    </inertial>
+  </link>
+
+  <joint name="imu_joint" type="fixed">
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="imu_link"/>
+  </joint>
+
+  <joint name="3d_laser_scanner_joint" type="fixed">
+    <origin xyz="0.06 0.0 0.074" rpy="0.0 0.0 0.0"/>
+    <parent link="base_link"/>
+    <child link="laser_link"/>
+  </joint>
+
+  <joint name="third_person_camera_joint" type="fixed">
+    <origin xyz="-1.5 0.0 1.0" rpy="0.0 0.25 0.0"/>
+    <parent link="base_link"/>
+    <child link="camera_link"/>
+  </joint>
+
+
+</robot>
