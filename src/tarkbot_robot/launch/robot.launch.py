@@ -26,6 +26,11 @@ def generate_launch_description():
             executable= "tarkbot_robot_node",         #节点。
             parameters= [tarkbot_config],             #接入参数文件
             output= 'screen',
+            remappings=[
+                ('/odom', '/odom_raw'),
+                ('/imu', '/imu_raw')
+                # Add more remappings as needed
+            ],
             )
 
     foot_to_base = launch_ros.actions.Node(
@@ -42,6 +47,10 @@ def generate_launch_description():
 
     bringup_robot_description = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','robot_description.launch.py'))
+    )
+
+    bringup_robot_localization = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','ekf.launch.py'))
     )
 
     bringup_rplidar = IncludeLaunchDescription(
@@ -65,6 +74,7 @@ def generate_launch_description():
     ld.add_action(robot_base)
     ld.add_action(foot_to_base)
 #     ld.add_action(bringup_robot_description)
+    ld.add_action(bringup_robot_localization)
     ld.add_action(bringup_robot_desc)
     ld.add_action(joint_pub)
     ld.add_action(bringup_rplidar)
