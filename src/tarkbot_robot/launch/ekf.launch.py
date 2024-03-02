@@ -32,7 +32,8 @@ def generate_launch_description():
             output='screen',
             parameters=[os.path.join(get_package_share_directory("tarkbot_robot"), 'config', 'ekf.yaml')],
             remappings=[
-                ('/odometry/filtered', '/odom'),
+                ('/odometry/filtered', '/odom_fil'),
                 ],
            ),
 ])
+ 
