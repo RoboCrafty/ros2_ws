@@ -13,7 +13,7 @@ ekf_filter_node:
 # The period, in seconds, after which we consider a sensor to have timed out. In this event, we carry out a predict
 # cycle on the EKF without correcting it. This parameter can be thought of as the minimum frequency with which the
 # filter will generate new output. Defaults to 1 / frequency if not specified.
-        sensor_timeout: 0.1
+        sensor_timeout: 0.02
 
 # ekf_localization_node and ukf_localization_node both use a 3D omnidirectional motion model. If this parameter is
 # set to true, no 3D information will be used in your state estimate. Use this if you are operating in a planar
@@ -49,7 +49,7 @@ ekf_filter_node:
         publish_acceleration: false
 
 # If the filter sees a jump back in time, the filter is reset (convenient for testing with rosbags!)
-        reset_on_time_jump: true
+        reset_on_time_jump: false
 
 # REP-105 (http://www.ros.org/reps/rep-0105.html) specifies four principal coordinate frames: base_link, odom, map, and
 # earth. base_link is the coordinate frame that is affixed to the robot. Both odom and map are world-fixed frames.
@@ -90,7 +90,7 @@ ekf_filter_node:
 # has no pose information, so the first six values would be meaningless in that case. Each vector defaults to all false
 # if unspecified, effectively making this parameter required for each sensor.
         odom0_config: [true, true, true,
-                       false, false, false,
+                       true,  true,  true,
                        true,  true,  true,
                        false, false, false,
                        false, false, false]
@@ -139,8 +139,8 @@ ekf_filter_node:
         imu0_config: [false, false, false,
                       true,  true,  true,
                       false, false, false,
-                      true,  true,  true,
-                      true,  false,  true]
+                      false, false, false,
+                      false,  false,  false]
 
         #        [x_pos   , y_pos    , z_pos,
         #         roll    , pitch    , yaw,
@@ -233,3 +233,7 @@ ekf_filter_node:
                                       0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     1e-9,   0.0,    0.0,
                                       0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    1e-9,   0.0,
                                       0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,    0.0,     0.0,     0.0,     0.0,    0.0,    1e-9]
+
+        smooth_lagged_data: true
+        # dynamic_process_noise_covariance: true
+        reset_on_time_jump: true
