@@ -27,8 +27,8 @@ def generate_launch_description():
             parameters= [tarkbot_config],             #接入参数文件
             output= 'screen',
             remappings=[
-                # ('/odom', '/odom_raw'),
-                # ('/imu', '/imu_raw')
+                ('/odom', '/odom_raw'),
+                ('/imu', '/imu_raw')
                 # Add more remappings as needed
             ],
             )

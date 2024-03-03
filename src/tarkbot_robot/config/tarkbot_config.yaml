@@ -15,7 +15,7 @@ tarkbot_robot_node:
     
     #config param
     robot_port: /dev/tarkbot
-    pub_odom_tf: true
+    pub_odom_tf: false
     akm_servo_offset: 120 
 
 
