@@ -74,7 +74,7 @@ def generate_launch_description():
     ld.add_action(robot_base)
     ld.add_action(foot_to_base)
 #     ld.add_action(bringup_robot_description)
-#     ld.add_action(bringup_robot_localization)
+    ld.add_action(bringup_robot_localization)
     ld.add_action(bringup_robot_desc)
     ld.add_action(joint_pub)
     ld.add_action(bringup_rplidar)
