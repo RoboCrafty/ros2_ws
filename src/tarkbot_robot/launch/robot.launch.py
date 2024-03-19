@@ -54,7 +54,7 @@ def generate_launch_description():
     )
 
     bringup_rplidar = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('rplidar_ros')),'launch', 'rplidar_a2m12_launch.py')),
+            PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('rplidar_ros')),'launch', 'rplidar_a2m8_launch.py')),
     )    
 
     bringup_robot_desc = IncludeLaunchDescription(
@@ -74,7 +74,7 @@ def generate_launch_description():
     ld.add_action(robot_base)
     ld.add_action(foot_to_base)
 #     ld.add_action(bringup_robot_description)
-    ld.add_action(bringup_robot_localization)
+#     ld.add_action(bringup_robot_localization)
     ld.add_action(bringup_robot_desc)
     ld.add_action(joint_pub)
     ld.add_action(bringup_rplidar)
