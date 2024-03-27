@@ -17,7 +17,7 @@ def generate_launch_description():
     frame_id = LaunchConfiguration('frame_id', default='laser_link')
     inverted = LaunchConfiguration('inverted', default='false')
     angle_compensate = LaunchConfiguration('angle_compensate', default='true')
-    scan_mode = LaunchConfiguration('scan_mode', default='Sensitivity')
+    scan_mode = LaunchConfiguration('scan_mode', default='')
     
     return LaunchDescription([
 
@@ -65,6 +65,7 @@ def generate_launch_description():
                          'serial_baudrate': serial_baudrate,
                          'frame_id': frame_id,
                          'inverted': inverted,
+                         
                          'angle_compensate': angle_compensate}],
             output='screen'),
     ])
