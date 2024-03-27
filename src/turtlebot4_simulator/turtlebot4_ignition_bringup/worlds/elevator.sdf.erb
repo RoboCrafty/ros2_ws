@@ -1,0 +1,414 @@
+<?xml version="1.0" ?>
+<%#
+  To modify the model, change the instance variables (@var):
+    E.g. To change the number of floors, specify the height of each floor in @floor_heights.
+
+  To instantiate the model, run:
+    erb -T 1 elevator.sdf.erb > elevator.sdf
+    xmllint -o elevator.sdf --format elevator.sdf
+%>
+<%
+  require 'matrix'
+
+  @model_name = 'elevator'
+  @floor_heights = [2.2, 2.2, 2.2, 2.2]
+  @cabin_wall_thickness = 0.1
+  @wall_thickness = 0.15
+  @floor_thickness = 0.2
+  @wall_clearance = 0.05
+  @has_walls = true
+  @has_front_wall = true
+
+  @cabin_size = Vector[1.6, 2.0, 2.2]
+  @door_size = Vector[0.1, 1.4, 2.0]
+
+  @structure_mass = 1000
+  @cabin_mass = 200
+  @door_mass = 20
+
+  @has_entrance = true
+  @entrance_size = Vector[2.0, 4.0, @floor_thickness]
+
+  @has_door_lidar = true
+  @door_lidar_ground_clearance = 0.2
+
+  @structure_color = Vector[1.0, 1.0, 1.0]
+  @door_color = Vector[1.0, 0.0, 0.0]
+  @cabin_color = Vector[0.175, 0.175, 0.175]
+
+  wall_names = ['right', 'left', 'rear', 'front']
+  cabin_wall_names = ['bottom', 'top', 'right', 'left', 'rear']
+
+  wall_sizes = [Vector[@wall_thickness + @cabin_size[0] + @cabin_wall_thickness + @wall_clearance, @wall_thickness, @floor_thickness],
+                Vector[@wall_thickness + @cabin_size[0] + @cabin_wall_thickness + @wall_clearance, @wall_thickness, @floor_thickness],
+                Vector[@wall_thickness, @cabin_size[1] + 2 * (@cabin_wall_thickness + @wall_clearance + @wall_thickness), @floor_thickness],
+                Vector[Float::NAN, Float::NAN, Float::NAN]]
+  cabin_wall_sizes = [Vector[@cabin_size[0], @cabin_size[1], @cabin_wall_thickness],
+                      Vector[@cabin_size[0], @cabin_size[1], @cabin_wall_thickness],
+                      Vector[@cabin_size[0], @cabin_wall_thickness, @cabin_size[2] + 2 * @cabin_wall_thickness],
+                      Vector[@cabin_size[0], @cabin_wall_thickness, @cabin_size[2] + 2 * @cabin_wall_thickness],
+                      Vector[@cabin_wall_thickness, @cabin_size[1] + 2 * @cabin_wall_thickness, @cabin_size[2] + 2 * @cabin_wall_thickness]]
+
+  # The origin of the model is in the center of the cabin at floor level 0
+  # The origin of each floor is in the center of the cabin and at the floor level
+  model_pos = Vector[0, 0, @floor_thickness]
+  cabin_pos = Vector[0, 0, 0]
+  door_pos = Vector[@cabin_size[0] / 2 + @door_size[0] / 2, 0, @door_size[2] / 2]
+  entrance_pos = Vector[@cabin_size[0] / 2 + @wall_thickness + @entrance_size[0] / 2, 0, - @floor_thickness / 2]
+  wall_pos = [Vector[0, - @cabin_size[1] / 2 - @cabin_wall_thickness - @wall_clearance - @wall_thickness / 2, 0],
+              Vector[0, @cabin_size[1] / 2 + @cabin_wall_thickness + @wall_clearance + @wall_thickness / 2, 0],
+              Vector[- @cabin_size[0] / 2 - @cabin_wall_thickness - @wall_clearance - @wall_thickness / 2, 0, 0],
+              Vector[@cabin_size[0] / 2 + @wall_thickness / 2, 0, 0]]
+  cabin_wall_pos = [Vector[0, 0, - @cabin_wall_thickness / 2],
+                    Vector[0, 0, @cabin_size[2] + @cabin_wall_thickness / 2],
+                    Vector[0, - (@cabin_size[1] + @cabin_wall_thickness) / 2, @cabin_size[2] / 2],
+                    Vector[0, (@cabin_size[1] + @cabin_wall_thickness) / 2, @cabin_size[2] / 2],
+                    Vector[- (@cabin_size[0] + @cabin_wall_thickness) / 2, 0, @cabin_size[2] / 2]]
+  door_lidar_pos = Vector[@cabin_size[0] / 2 + @wall_thickness / 2, -@door_size[1] / 2, @door_lidar_ground_clearance]
+
+  def get_floor_level(index)
+    if index > @floor_heights.size()
+      raise "Invalid floor index (#{index})"
+    end
+
+    level = 0.0
+    for i in 1..index
+      level += @floor_heights[i-1] + @floor_thickness
+    end
+    
+    return level
+  end
+
+  def get_world_pos(pos, index)
+    Vector[0.0, 0.0, get_floor_level(index)] + pos
+  end
+
+  def write_vector(vec)
+    "#{vec[0].round(5)} #{vec[1].round(5)} #{vec[2].round(5)}"
+  end
+
+  def write_global_pos(pos, index)
+    write_vector(get_world_pos(pos, index))
+  end
+
+  def write_box_inertial(mass, size, pos=Vector[0, 0, 0])
+    "<inertial>
+       <mass>#{mass}</mass>
+       <inertia>
+         <ixx>#{(size[1]**2 + size[2]**2) * mass / 12.0}</ixx>
+         <ixy>0</ixy>
+         <ixz>0</ixz>
+         <iyy>#{(size[0]**2 + size[2]**2) * mass / 12.0}</iyy>
+         <iyz>0</iyz>
+         <izz>#{(size[0]**2 + size[1]**2) * mass / 12.0}</izz>
+       </inertia>
+       <pose>#{write_vector(pos)} 0 0 0</pose>
+     </inertial>"
+  end
+
+  def write_box_geometry(size)
+    "<geometry>
+       <box>
+         <size>#{write_vector(size)}</size>
+       </box>
+     </geometry>"
+  end
+%>
+
+
+<sdf version="1.6">
+  <model name="<%= @model_name %>">
+    <pose><%= write_vector(model_pos) %> 0 0 0</pose>
+
+    <!-- ========================= START OF WALLS ========================== -->
+    <link name="structure">
+      <kinematic>true</kinematic>
+      <pose><%= write_global_pos(cabin_pos, 0) %> 0 0 0</pose>
+      <%=
+        size = Vector[@cabin_size[0], @cabin_size[1], get_floor_level(@floor_heights.size())]
+        com_pos = Vector[model_pos[0], model_pos[1], get_floor_level([@floor_heights.size() / 2 - 1, 0].max)]
+        write_box_inertial(@structure_mass, size, com_pos)
+      %>
+<%
+  for i in 0..@floor_heights.size()-1
+    wall_front_top_height = @floor_heights[i] - @door_size[2]
+    wall_front_side_width = (@cabin_size[1] - @door_size[1]) / 2 + @cabin_wall_thickness + @wall_clearance
+    name_front_walls = ['bottom', 'top', 'right', 'left']
+    pos_front_walls = [wall_pos[3] + Vector[0, 0, -@floor_thickness / 2],
+                       wall_pos[3] + Vector[0, 0, @door_size[2] + wall_front_top_height / 2],
+                       wall_pos[3] + Vector[0, - (@door_size[1] + wall_front_side_width) / 2, @door_size[2] / 2],
+                       wall_pos[3] + Vector[0, (@door_size[1] + wall_front_side_width) / 2, @door_size[2] / 2]]
+    size_front_walls = [Vector[@wall_thickness, @cabin_size[1] + 2 * (@cabin_wall_thickness + @wall_clearance), @floor_thickness],
+                        Vector[@wall_thickness, @cabin_size[1] + 2 * (@cabin_wall_thickness + @wall_clearance), wall_front_top_height],
+                        Vector[@wall_thickness, wall_front_side_width, @door_size[2]],
+                        Vector[@wall_thickness, wall_front_side_width, @door_size[2]]]
+%>
+<%
+  for j in 0..3  # front-[bottom, top, right, left]
+    if @has_front_wall or j == 0
+%>
+      <visual name="wall_<%= wall_names[3] %>_<%= name_front_walls[j] %>_visual_<%= i.to_s %>">
+        <pose><%= write_global_pos(pos_front_walls[j], i) %> 0 0 0</pose>
+        <%= write_box_geometry(size_front_walls[j]) %>
+        <material>
+          <ambient><%= write_vector(@structure_color) %> 1</ambient>
+          <diffuse><%= write_vector(@structure_color) %> 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      <collision name="wall_<%= wall_names[3] %>_<%= name_front_walls[j] %>_collision_<%= i.to_s %>">
+        <pose><%= write_global_pos(pos_front_walls[j], i) %> 0 0 0</pose>
+        <%= write_box_geometry(size_front_walls[j]) %>
+      </collision>
+<%
+    end  # if @has_front_wall or j == 0
+  end  # for j in 0..3
+%>
+<%
+  if @has_walls
+    for j in 0..2  # [right, left, rear]
+      pos = wall_pos[j] + Vector[0, 0, (@floor_heights[i] - @floor_thickness) / 2]
+      size = wall_sizes[j] + Vector[0, 0, @floor_heights[i]]
+%>
+      <visual name="wall_<%= wall_names[j] %>_visual_<%= i.to_s %>">
+        <pose><%= write_global_pos(pos, i) %> 0 0 0</pose>
+        <%= write_box_geometry(size) %>
+        <material>
+          <ambient><%= write_vector(@structure_color) %> 1</ambient>
+          <diffuse><%= write_vector(@structure_color) %> 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      <collision name="wall_<%= wall_names[j] %>_collision_<%= i.to_s %>">
+        <pose><%= write_global_pos(pos, i) %> 0 0 0</pose>
+        <%= write_box_geometry(size) %>
+      </collision>
+<%
+    end  # for j in 0..2
+  end  # if @has_walls
+%>
+<%
+  if @has_entrance
+%>
+      <visual name="entrance_visual_<%= i.to_s %>">
+        <pose><%= write_global_pos(entrance_pos, i) %> 0 0 0</pose>
+        <%= write_box_geometry(@entrance_size) %>
+        <material>
+          <ambient><%= write_vector(@structure_color) %> 1</ambient>
+          <diffuse><%= write_vector(@structure_color) %> 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      <collision name="entrance_collision_<%= i.to_s %>">
+        <pose><%= write_global_pos(entrance_pos, i) %> 0 0 0</pose>
+        <%= write_box_geometry(@entrance_size) %>
+      </collision>
+<%
+  end  # if @has_entrance
+%>
+<%
+  end  # for i in 0..@floor_heights.size()-1
+%>
+    </link>
+    <joint name="foundation" type="fixed">
+      <parent>world</parent>
+      <child>structure</child>
+    </joint>
+    <!-- ========================== END OF WALLS =========================== -->
+
+
+    <!-- ========================= START OF DOORS ========================== -->
+<%
+  for i in 0..@floor_heights.size()-1
+%>
+    <link name="door_panel_<%= i.to_s %>">
+      <pose><%= write_global_pos(door_pos, i) %> 0 0 0</pose>
+      <%= write_box_inertial(@door_mass, @door_size) %>
+      <visual name="door_visual_<%= i.to_s %>">
+        <%= write_box_geometry(@door_size) %>
+        <material>
+          <ambient><%= write_vector(@door_color) %> 1</ambient>
+          <diffuse><%= write_vector(@door_color) %> 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      <collision name="door_collision_<%= i.to_s %>">
+        <%= write_box_geometry(@door_size) %>
+      </collision>
+    </link>
+    <joint name="door_<%= i.to_s %>" type="prismatic">
+      <parent>structure</parent>
+      <child>door_panel_<%= i.to_s %></child>
+      <axis>
+        <xyz>0 1 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper><%= @door_size[1] %></upper>
+          <effort>5000</effort>
+          <velocity>0.1</velocity>
+        </limit>
+        <dynamics>
+          <damping>30</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <plugin
+      filename="ignition-gazebo-joint-position-controller-system"
+      name="ignition::gazebo::systems::JointPositionController">
+      <joint_name>door_<%= i.to_s %></joint_name>
+      <p_gain>60</p_gain>
+      <i_gain>0</i_gain>
+      <d_gain>40</d_gain>
+      <cmd_min>-20</cmd_min>
+      <cmd_max>20</cmd_max>
+    </plugin>
+<%
+  end  # for i in 0..@floor_heights.size()-1
+%>
+    <!-- ========================== END OF DOORS =========================== -->
+
+
+    <!-- ========================= START OF CABIN ========================== -->
+    <link name="cabin">
+      <pose><%= write_global_pos(cabin_pos, 0) %> 0 0 0</pose>
+      <%= write_box_inertial(@cabin_mass, @cabin_size, Vector[0, 0, @cabin_size[2] / 2]) %>
+<%
+  y_offsets = [-@cabin_size[1] / 4, @cabin_size[1] / 4]
+  y_offsets.each_with_index do |y_offset,i|
+%>
+      <light type="spot" name="spot_<%= i.to_s %>">
+        <pose><%= write_vector(Vector[0, y_offset, 0.95*@cabin_size[2]]) %> 0 0 0</pose>
+        <diffuse>1 1 1 1</diffuse>
+        <specular>.2 .2 .2 1</specular>
+        <attenuation>
+          <range><%= @cabin_size[2] %></range>
+          <linear>0.2</linear>
+          <constant>0.05</constant>
+          <quadratic>0.01</quadratic>
+        </attenuation>
+        <direction>0 0 1</direction>
+        <spot>
+          <inner_angle>0.1</inner_angle>
+          <outer_angle>1.0</outer_angle>
+          <falloff>0.8</falloff>
+        </spot>
+        <cast_shadows>true</cast_shadows>
+      </light>
+<%
+  end  # y_offsets.each_with_index do |y_offset,i|
+%>
+<%
+  for i in 0..4  # [bottom, top, right, left, rear]
+%>
+      <visual name="cabin_<%= cabin_wall_names[i] %>_visual">
+        <pose><%= write_vector(cabin_wall_pos[i]) %> 0 0 0</pose>
+        <%= write_box_geometry(cabin_wall_sizes[i]) %>
+        <material>
+          <ambient><%= write_vector(@cabin_color) %> 1</ambient>
+          <diffuse><%= write_vector(@cabin_color) %> 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+        </material>
+      </visual>
+      <collision name="cabin_<%= cabin_wall_names[i] %>_collision">
+        <pose><%= write_vector(cabin_wall_pos[i]) %> 0 0 0</pose>
+        <%= write_box_geometry(cabin_wall_sizes[i]) %>
+      </collision>
+<%
+  end  # for i in 0..4
+%>
+    </link>
+    <joint name="lift" type="prismatic">
+      <parent>structure</parent>
+      <child>cabin</child>
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper><%= get_floor_level(@floor_heights.size()-1) %></upper>
+          <effort>50000000</effort>
+          <velocity>0.5</velocity>
+        </limit>
+        <dynamics>
+          <damping>180000</damping>
+        </dynamics>
+      </axis>
+    </joint>
+    <plugin
+      filename="ignition-gazebo-joint-position-controller-system"
+      name="ignition::gazebo::systems::JointPositionController">
+      <joint_name>lift</joint_name>
+      <p_gain>4000000</p_gain>
+      <i_gain>2000</i_gain>
+      <d_gain>5000</d_gain>
+      <i_min>-2000</i_min>
+      <i_max>2000</i_max>
+      <cmd_min>-80000</cmd_min>
+      <cmd_max>120000</cmd_max>
+    </plugin>
+    <!-- ========================== END OF CABIN =========================== -->
+
+
+    <!-- =================== START OF FLOOR REFERENCES ===================== -->
+<%
+  for i in 0..@floor_heights.size()-1
+%>
+    <link name="floor_<%= i.to_s %>">
+      <pose><%= write_global_pos(Vector[0, 0, 0], i) %> 0 0 0</pose>
+    </link>
+    <joint name="floor_<%= i.to_s %>_joint" type="fixed">
+      <parent>structure</parent>
+      <child>floor_<%= i.to_s %></child>
+    </joint>
+<%
+  end  # for i in 0..@floor_heights.size()-1
+%>
+    <!-- ==================== END OF FLOOR REFERENCES ====================== -->
+
+
+    <!-- ===================== START OF DOOR LIDARS ======================== -->
+<%
+  if @has_door_lidar
+    for i in 0..@floor_heights.size()-1
+%>
+    <link name="door_lidar_<%= i.to_s %>">
+      <pose><%= write_global_pos(door_lidar_pos, i) %> <%= Math::PI/2 %> 0 <%= Math::PI/2 %></pose>
+      <sensor name="sensor" type="gpu_lidar">
+        <topic>model/<%= @model_name %>/door_<%= i.to_s %>/lidar</topic>
+        <update_rate>10</update_rate>
+        <lidar>
+          <scan>
+            <horizontal>
+              <samples>1</samples>
+              <resolution>1</resolution>
+              <min_angle>0</min_angle>
+              <max_angle>0</max_angle>
+            </horizontal>
+          </scan>
+          <range>
+            <min>0.001</min>
+            <max><%= @door_size[1]-0.005 %></max>
+            <resolution>0.01</resolution>
+          </range>
+        </lidar>
+      </sensor>
+    </link>
+    <joint name="door_lidar_<%= i.to_s %>_joint" type="fixed">
+      <parent>structure</parent>
+      <child>door_lidar_<%= i.to_s %></child>
+    </joint>
+<%
+    end  # for i in 0..@floor_heights.size()-1
+  end  # if @has_door_lidar
+%>
+    <!-- ====================== END OF DOOR LIDARS ========================= -->
+
+
+    <!-- ====================== START OF CONTROLLER ======================== -->
+    <plugin
+      filename="ignition-gazebo-elevator-system"
+      name="ignition::gazebo::systems::Elevator">
+    </plugin>
+    <!-- ======================= END OF CONTROLLER ========================= -->
+
+  </model>
+</sdf>

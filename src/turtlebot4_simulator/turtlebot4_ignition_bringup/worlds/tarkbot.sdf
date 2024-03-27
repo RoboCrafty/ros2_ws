@@ -59,11 +59,11 @@
       </link>
     </model>
 
-    <!-- <include>
-      <uri>https://fuel.gazebosim.org/1.0/nlamprian/models/Elevator</uri>
-    </include> -->
     <include>
-      <uri>/home/fuzailx/multi_floor_v2/model.sdf</uri>
+      <uri>/home/crabbycat/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/elevator.sdf</uri>
+    </include>
+    <include>
+      <uri>/home/crabbycat/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/building.sdf</uri>
     </include>
 
   </world>

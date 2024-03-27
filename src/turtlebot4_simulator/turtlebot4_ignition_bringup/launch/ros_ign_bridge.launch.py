@@ -206,6 +206,21 @@ def generate_launch_description():
             ]
     )
 
+    # Camera sensor bridge
+    elevator_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='elevator_bridge',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}],
+        arguments=[
+            ['/model/elevator/state@std_msgs/msg/Int32@ignition.msgs.Int32'],
+            ['/model/elevator/cmd@std_msgs/msg/Int32@ignition.msgs.Int32'],
+            ],
+        remappings=[
+            ]
+    )
+
     # Define LaunchDescription variable
     ld = LaunchDescription(ARGUMENTS)
     ld.add_action(create3_bridge)
@@ -214,4 +229,5 @@ def generate_launch_description():
     ld.add_action(hmi_led_msg_bridge)
     ld.add_action(lidar_bridge)
     ld.add_action(oakd_camera_bridge)
+    ld.add_action(elevator_bridge)
     return ld
