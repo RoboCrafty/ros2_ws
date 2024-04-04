@@ -29,6 +29,33 @@
       </visual>
       <pose>0 -0.019886 2.5 0 -0 0</pose>
     </link>
+    <link name='Floor_1'>
+      <collision name='Floor_1_Collision'>
+        <geometry>
+          <box>
+            <size>50.6 8.96003 0.1</size>
+          </box>
+        </geometry>
+        <pose>0 0 0.05 0 -0 0</pose>
+      </collision>
+      <visual name='Floor_1_Visual'>
+        <pose>0 0 0.05 0 -0 0</pose>
+        <geometry>
+          <box>
+            <size>27.6 8.96003 0.1</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0.435294 0.296078 0.17451 1</diffuse>
+            <specular>0.435294 0.296078 0.17451 1</specular>
+          <ambient>0.435294 0.296078 0.17451 1</ambient>
+        </material>
+        <meta>
+          <layer>0</layer>
+        </meta>
+      </visual>
+      <pose>0 -0.019886 0.1 0 -0 0</pose>
+    </link>
     <link name='Wall_101'>
       <collision name='Wall_101_Collision'>
         <geometry>
