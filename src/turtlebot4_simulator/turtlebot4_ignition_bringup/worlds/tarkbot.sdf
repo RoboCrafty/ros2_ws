@@ -60,11 +60,11 @@
     </model>
 
     <include>
-      <uri>/home/crabbycat/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/elevator.sdf</uri>
+      <uri>/home/fuzailx/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/elevator.sdf</uri>
     </include>
     <include>
-      <uri>/home/crabbycat/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/building.sdf</uri>
+      <uri>/home/fuzailx/ros2_ws/src/turtlebot4_simulator/turtlebot4_ignition_bringup/worlds/building.sdf</uri>
     </include>
-
+   
   </world>
 </sdf>
