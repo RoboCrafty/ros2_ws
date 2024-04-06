@@ -1,0 +1,5 @@
+multi_floor_goal:
+  ros__parameters:
+    elevator_goal_x: 1.0
+    elevator_goal_y: 2.0
+    elevator_goal_z: 0.0
