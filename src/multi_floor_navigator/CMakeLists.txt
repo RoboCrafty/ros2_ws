@@ -14,6 +14,10 @@ find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(nav2_msgs REQUIRED)
+find_package(yaml-cpp REQUIRED)
+
+# include_directories(${yaml-cpp_INCLUDE_DIRS})
+
 
 add_executable(multi_floor_goal src/multi_floor_goal.cpp)
 ament_target_dependencies(multi_floor_goal
@@ -22,7 +26,9 @@ ament_target_dependencies(multi_floor_goal
     geometry_msgs
     std_msgs
     nav2_msgs
+    yaml-cpp
 )
+target_link_libraries(multi_floor_goal  ${YAML_CPP_LIBRARIES})
 
 install(TARGETS
         multi_floor_goal  
@@ -44,5 +50,8 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+# target_link_libraries(${PROJECT_NAME} ${YAML_CPP_LIBRARIES})
+
 
 ament_package()

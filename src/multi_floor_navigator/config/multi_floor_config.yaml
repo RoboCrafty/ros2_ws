@@ -1,5 +1,12 @@
+# multi_floor_goal:
+#   ros__parameters:
+#     elevator_goal_x: 1.0
+#     elevator_goal_y: 2.0
+#     elevator_goal_z: 0.0
 multi_floor_goal:
-  ros__parameters:
-    elevator_goal_x: 1.0
-    elevator_goal_y: 2.0
-    elevator_goal_z: 0.0
+  ros__parameters:  
+    floor_maps:
+      - floor_number: 0
+        map_yaml: "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/SimFloor0_V1.yaml"
+      - floor_number: 1
+        map_yaml: "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/SimFloor1_V1.yaml"
