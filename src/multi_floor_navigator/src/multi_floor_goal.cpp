@@ -7,6 +7,11 @@
 #include "nav2_msgs/srv/load_map.hpp"
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+#include <filesystem> // C++17 feature, include <experimental/filesystem> for older compilers
+#include <regex>
+
+namespace fs = std::filesystem;
+
 // #include <chrono> 
 
 // Define a constant for the timeout duration (20 seconds)
@@ -146,7 +151,7 @@ private:
     {
         x= x+1;
         last_feedback_distance_remaining_ = feedback->feedback.distance_remaining;
-        //  RCLCPP_INFO(this->get_logger(), "feedback from navigate to pose: %f", feedback->feedback.distance_remaining);
+        // RCLCPP_INFO(this->get_logger(), "feedback from navigate to pose: %f, Value of x: %d, value of done: %i, value of is elv goal: %i", feedback->feedback.distance_remaining, x, done, is_elevator_goal);
         if (feedback->feedback.distance_remaining < 0.1 && feedback->feedback.distance_remaining > 0 && x > 15 && !done && is_elevator_goal)
         {
             x = 0;
@@ -226,31 +231,50 @@ private:
 
     void loadFloorMapConfig()
     {
-        // Read floor map configuration from parameter server
-        // auto config_file = this->get_parameter("floor_map_config_file").as_string();
-        std::string config_file = "/home/crabbycat/ros2_ws/src/multi_floor_navigator/config/multi_floor_config.yaml";
-        std::ifstream fin(config_file);
-        YAML::Node config = YAML::Load(fin);
+        std::string maps_dir = "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/";
+        std::regex floor_regex("Floor(\\d+)_.*\\.yaml");
 
-        // Parse floor map configuration
-        for (const auto& entry : config["floor_maps"])
+        RCLCPP_INFO(this->get_logger(), "Loading floor map configuration from directory: %s", maps_dir.c_str());
+
+        for (const auto& entry : fs::directory_iterator(maps_dir))
         {
-            int floor = entry["floor"].as<int>();
-            std::string map_yaml = entry["map_yaml"].as<std::string>();
-            floor_map_config_[floor] = map_yaml;
+            if (fs::is_regular_file(entry))
+            {
+                std::string filename = entry.path().filename().string();
+                std::smatch match;
+
+                if (std::regex_search(filename, match, floor_regex))
+                {
+                    int floor = std::stoi(match[1].str());
+                    std::string map_yaml = entry.path().string();
+                    floor_map_config_[floor] = map_yaml;
+
+                    RCLCPP_INFO(this->get_logger(), "Found floor map: Floor %d, Map YAML: %s", floor, map_yaml.c_str());
+                }
+                else
+                {
+                    RCLCPP_INFO(this->get_logger(), "Ignoring file with unsupported filename format: %s", filename.c_str());
+                }
+            }
+            else
+            {
+                RCLCPP_INFO(this->get_logger(), "Ignoring directory entry: %s", entry.path().c_str());
+            }
         }
     }
 
     void loadMap(const std::string& map_url)
     {
+        RCLCPP_INFO(this->get_logger(), "Loading Map.");
+
         auto request = std::make_shared<nav2_msgs::srv::LoadMap::Request>();
         request->map_url = map_url;
 
         // Send the service request
         auto future = map_load_client_->async_send_request(request);
-        rclcpp::spin_until_future_complete(this->get_node_base_interface(), future);
+        // rclcpp::spin_until_future_complete(this->get_node_base_interface(), future);
 
-        RCLCPP_INFO(this->get_logger(), "Loading Map.");
+        
 
         // if (future.wait_for(std::chrono::seconds(1)) == std::future_status::ready)
         // {
