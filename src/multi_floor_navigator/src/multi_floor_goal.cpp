@@ -265,7 +265,7 @@ private:
 
     void loadMap(const std::string& map_url)
     {
-        RCLCPP_INFO(this->get_logger(), "Loading Map.");
+        RCLCPP_INFO(this->get_logger(), ANSI_COLOR_CYAN "Loaded Map for new floor." ANSI_COLOR_RESET);
 
         auto request = std::make_shared<nav2_msgs::srv::LoadMap::Request>();
         request->map_url = map_url;
