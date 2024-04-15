@@ -29,15 +29,13 @@ namespace fs = std::filesystem;
 class CustomNode : public rclcpp::Node
 {
 public:
-    CustomNode() : Node("multi_floor_goal")
+    CustomNode() : Node("sim-multi_floor_goal")
     {
         // Ask the user for the starting floor
         std::cout << "Please enter the starting floor (e.g., 0, 1, 2, ...): ";
         std::cin >> starting_floor_;
         std::cout << "Current floor selected as floor " << starting_floor_ << std::endl;
         current_floor_ = starting_floor_;
-        elevator_arrived_ = false;
-        
         // Get elevator coordinates from parameters
         this->declare_parameter("elevator_goal_x", -6.14521);
         this->declare_parameter("elevator_goal_y", -3.1067);
@@ -74,10 +72,10 @@ public:
         feedback_sub_ = this->create_subscription<nav2_msgs::action::NavigateToPose_FeedbackMessage>(
             "/navigate_to_pose/_action/feedback", 10, std::bind(&CustomNode::feedbackCallback, this, std::placeholders::_1));
 
-        //  elevator_feedback_sub_ = this->create_subscription<std_msgs::msg::Int32>(
-        //     "/model/elevator/state",
-        //     10,
-        //     std::bind(&CustomNode::elevatorFeedbackCallback, this, std::placeholders::_1));
+         elevator_feedback_sub_ = this->create_subscription<std_msgs::msg::Int32>(
+            "/model/elevator/state",
+            10,
+            std::bind(&CustomNode::elevatorFeedbackCallback, this, std::placeholders::_1));
 
 
     }
@@ -85,8 +83,6 @@ public:
 private:
     void goal_callback(const geometry_msgs::msg::Pose::SharedPtr msg)
     {
-        auto elevator_goal = geometry_msgs::msg::PoseStamped();
-        elevator_arrived_ = false;
         // int current_floor = static_cast<int>(msg->position.z);
         // Check if goal is on the same floor or different floor
         // For simplicity, let's assume if the z coordinate is different, it's on a different floor
@@ -95,7 +91,7 @@ private:
            
     
             // Goal is on a different floor, publish elevator coordinates
-            
+            auto elevator_goal = geometry_msgs::msg::PoseStamped();
             elevator_goal.header.frame_id = "map"; // Example frame ID
             elevator_goal.header.stamp = this->now(); // Current time
             elevator_goal.pose.position.x = elevator_goal_x_; // Elevator coordinates from parameters
@@ -110,23 +106,9 @@ private:
             auto goal_handle_future = action_client_->async_send_goal(goal_pub);
             // RCLCPP_INFO(this->get_logger(), "Goal sent to action server.");
 
-            
-            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_CYAN "Please call the elevator and press 'y' once it has arrived." ANSI_COLOR_RESET);
-            
-            char response;
-            std::cin >> response;
+            elevator_command->data = current_floor_;
+            elevator_publisher_->publish(*elevator_command);
 
-            if (response == 'y')
-            {
-                RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Elevator has arrived!" ANSI_COLOR_RESET);
-                elevator_arrived_ = true;
-                
-            }
-            else
-            {
-                RCLCPP_INFO(this->get_logger(), ANSI_COLOR_RED "Invalid response. Cancelling goal." ANSI_COLOR_RESET);
-                return;
-            }
 
             x = 1;
             done = false;
@@ -137,7 +119,7 @@ private:
             user_goal_y_ = msg->position.y;
             user_goal_z_ = msg->position.z;
 
-             
+    
         }
         else
         {   
@@ -163,16 +145,6 @@ private:
             is_elevator_goal = false;
             
         }
-
-
-        if (elevator_arrived_)
-        {
-           // Send goal to action server
-            auto goal_pub = nav2_msgs::action::NavigateToPose::Goal();
-            goal_pub.pose = elevator_goal;
-            auto goal_handle_future = action_client_->async_send_goal(goal_pub);
-            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_MAGENTA "Goal to get inside elevator sent to action server." ANSI_COLOR_RESET);
-        }
     }
 
     void feedbackCallback(const nav2_msgs::action::NavigateToPose_FeedbackMessage::SharedPtr feedback)
@@ -186,51 +158,12 @@ private:
             done = true;
             RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Elevator goal reached!" ANSI_COLOR_RESET);
             done2 = true;
-            // // Command the elevator to go to the floor specified in the user_goal
-            // auto elevator_command = std::make_shared<std_msgs::msg::Int32>();
-            // elevator_command->data = goal_floor; // Replace user_goal_floor_ with appropriate variable
-            // elevator_publisher_->publish(*elevator_command);
-            // RCLCPP_INFO(this->get_logger(), ANSI_COLOR_MAGENTA "Sent command to elevator to go to floor: %d" ANSI_COLOR_RESET, goal_floor);
-            // Reset flag for future goals
-            is_elevator_goal = false;
-            elevator_arrived_ = false;
-            // Update current floor variable
-            current_floor_ = goal_floor;
+            // Command the elevator to go to the floor specified in the user_goal
+            auto elevator_command = std::make_shared<std_msgs::msg::Int32>();
+            elevator_command->data = goal_floor; // Replace user_goal_floor_ with appropriate variable
+            elevator_publisher_->publish(*elevator_command);
+            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_MAGENTA "Sent command to elevator to go to floor: %d" ANSI_COLOR_RESET, goal_floor);
 
-            take_elevator_feedback = true;
-
-
-            elevator_command(goal_floor);
-
-            
-            
-            
-            
-        }
-        else if (feedback->feedback.distance_remaining < 0.1 && feedback->feedback.distance_remaining > 0 && x > 15 && !done)
-        {   
-            x = 0;    
-            done = true;
-            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Goal reached!" ANSI_COLOR_RESET);   
-            take_elevator_feedback = false;      
-            is_elevator_goal = false;  
-            elevator_arrived_ = false;
-        }
-
-        
-    }
-
-    void elevator_command(int goal_floor)
-    {
-        RCLCPP_INFO(this->get_logger(), ANSI_COLOR_CYAN "Please press the '%d' button on the elevator and press 'y' once the elevator has reached the goal floor." ANSI_COLOR_RESET, goal_floor);
-        elevator_arrived_ = false;
-        char response;
-        std::cin >> response;
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');  // Clear the input buffer
-        if (response == 'y')
-        {
-            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Elevator has reached the requested floor: %d" ANSI_COLOR_RESET, goal_floor);
-            // Proceed to send the original user goal to nav2
             // Goal is on a different floor, load the corresponding map YAML file
             auto it = floor_map_config_.find(user_goal_z_);
             if (it != floor_map_config_.end())
@@ -244,6 +177,40 @@ private:
                 RCLCPP_ERROR(this->get_logger(), "Map YAML file not found for floor %f", user_goal_z_);
                 return;
             }
+            
+            // Reset flag for future goals
+            is_elevator_goal = false;
+
+            // Update current floor variable
+            current_floor_ = goal_floor;
+
+            take_elevator_feedback = true;
+            
+        }
+        else if (feedback->feedback.distance_remaining < 0.1 && feedback->feedback.distance_remaining > 0 && x > 15 && !done)
+        {   
+            x = 0;    
+            done = true;
+            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Goal reached!" ANSI_COLOR_RESET);   
+            take_elevator_feedback = false;      
+            is_elevator_goal = false;  
+        }
+
+        
+    }
+
+    void elevatorFeedbackCallback(const std_msgs::msg::Int32::SharedPtr msg)
+    {        
+        //Check if the elevator has reached the goal floor
+        
+        if (msg->data == goal_floor && take_elevator_feedback)
+        {   
+
+            take_elevator_feedback = false;
+            is_elevator_goal = false;
+
+
+            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Elevator has reached the requested floor: %d" ANSI_COLOR_RESET, goal_floor);
             // Send the coordinates from the initial user_goal to the elevator
             auto elevator_goal = geometry_msgs::msg::PoseStamped();
             elevator_goal.header.frame_id = "map"; // Example frame ID
@@ -260,48 +227,13 @@ private:
             done = false;
             x=0;
         }
-        else
-        {
-            RCLCPP_INFO(this->get_logger(), ANSI_COLOR_RED "Invalid response. Cancelling goal." ANSI_COLOR_RESET);
-            return;
-        }
     }
-
-    // void elevatorFeedbackCallback(const std_msgs::msg::Int32::SharedPtr msg)
-    // {        
-    //     //Check if the elevator has reached the goal floor
-        
-    //     if (msg->data == goal_floor && take_elevator_feedback)
-    //     {   
-
-    //         take_elevator_feedback = false;
-    //         is_elevator_goal = false;
-
-
-    //         RCLCPP_INFO(this->get_logger(), ANSI_COLOR_GREEN "Elevator has reached the requested floor: %d" ANSI_COLOR_RESET, goal_floor);
-    //         // Send the coordinates from the initial user_goal to the elevator
-    //         auto elevator_goal = geometry_msgs::msg::PoseStamped();
-    //         elevator_goal.header.frame_id = "map"; // Example frame ID
-    //         elevator_goal.header.stamp = this->now(); // Current time
-    //         elevator_goal.pose.position.x = user_goal_x_; // Use the coordinates from the initial user_goal
-    //         elevator_goal.pose.position.y = user_goal_y_;
-    //         elevator_goal.pose.position.z = user_goal_z_;
-
-    //         // Publish the goal to the action server
-    //         auto goal_pub = nav2_msgs::action::NavigateToPose::Goal();
-    //         goal_pub.pose = elevator_goal;
-    //         auto goal_handle_future = action_client_->async_send_goal(goal_pub);
-    //         RCLCPP_INFO(this->get_logger(), ANSI_COLOR_MAGENTA "Sent initial goal to action server after elevator reached the floor." ANSI_COLOR_RESET);
-    //         done = false;
-    //         x=0;
-    //     }
-    // }
 
     void loadFloorMapConfig()
     {
         std::string maps_dir = "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/";
         std::regex floor_regex("Floor(\\d+)_.*\\.yaml");
-        elevator_arrived_ = false;
+
         RCLCPP_INFO(this->get_logger(), "Loading floor map configuration from directory: %s", maps_dir.c_str());
 
         for (const auto& entry : fs::directory_iterator(maps_dir))
@@ -321,12 +253,12 @@ private:
                 }
                 else
                 {
-                    // RCLCPP_INFO(this->get_logger(), "Ignoring file with unsupported filename format: %s", filename.c_str());
+                    RCLCPP_INFO(this->get_logger(), "Ignoring file with unsupported filename format: %s", filename.c_str());
                 }
             }
             else
             {
-                // RCLCPP_INFO(this->get_logger(), "Ignoring directory entry: %s", entry.path().c_str());
+                RCLCPP_INFO(this->get_logger(), "Ignoring directory entry: %s", entry.path().c_str());
             }
         }
     }
@@ -337,7 +269,7 @@ private:
 
         auto request = std::make_shared<nav2_msgs::srv::LoadMap::Request>();
         request->map_url = map_url;
-        elevator_arrived_ = false;
+
         // Send the service request
         auto future = map_load_client_->async_send_request(request);
         // rclcpp::spin_until_future_complete(this->get_node_base_interface(), future);
@@ -406,7 +338,6 @@ private:
     bool is_elevator_goal;
     int goal_floor;
     bool take_elevator_feedback;
-    bool elevator_arrived_;
 
     double user_goal_x_;
     double user_goal_y_;

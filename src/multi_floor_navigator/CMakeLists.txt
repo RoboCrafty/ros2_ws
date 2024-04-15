@@ -28,9 +28,22 @@ ament_target_dependencies(multi_floor_goal
     nav2_msgs
     yaml-cpp
 )
+
+add_executable(sim-multi_floor_goal src/sim-multi_floor_goal.cpp)
+ament_target_dependencies(sim-multi_floor_goal
+    rclcpp
+    rclcpp_action
+    geometry_msgs
+    std_msgs
+    nav2_msgs
+    yaml-cpp
+)
+
+target_link_libraries(sim-multi_floor_goal  ${YAML_CPP_LIBRARIES})
 target_link_libraries(multi_floor_goal  ${YAML_CPP_LIBRARIES})
 
 install(TARGETS
+        sim-multi_floor_goal
         multi_floor_goal  
         DESTINATION lib/${PROJECT_NAME}        
 )
