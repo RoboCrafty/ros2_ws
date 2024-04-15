@@ -299,7 +299,7 @@ private:
 
     void loadFloorMapConfig()
     {
-        std::string maps_dir = "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/";
+        std::string maps_dir = "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/BlkD/";
         std::regex floor_regex("Floor(\\d+)_.*\\.yaml");
         elevator_arrived_ = false;
         RCLCPP_INFO(this->get_logger(), "Loading floor map configuration from directory: %s", maps_dir.c_str());
