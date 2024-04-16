@@ -39,8 +39,10 @@ public:
         elevator_arrived_ = false;
         
         // Get elevator coordinates from parameters
-        this->declare_parameter("elevator_goal_x", -6.14521);
-        this->declare_parameter("elevator_goal_y", -3.1067);
+        // this->declare_parameter("elevator_goal_x", -6.14521);
+        // this->declare_parameter("elevator_goal_y", -3.1067);
+        this->declare_parameter("elevator_goal_x", -0.287);
+        this->declare_parameter("elevator_goal_y", -3.370);
         this->declare_parameter("elevator_goal_z", 0.0);
     
         this->get_parameter("elevator_goal_x", elevator_goal_x_);
@@ -180,7 +182,7 @@ private:
         x= x+1;
         last_feedback_distance_remaining_ = feedback->feedback.distance_remaining;
         // RCLCPP_INFO(this->get_logger(), "feedback from navigate to pose: %f, Value of x: %d, value of done: %i, value of is elv goal: %i", feedback->feedback.distance_remaining, x, done, is_elevator_goal);
-        if (feedback->feedback.distance_remaining < 0.1 && feedback->feedback.distance_remaining > 0 && x > 15 && !done && is_elevator_goal)
+        if (feedback->feedback.distance_remaining < 0.2 && feedback->feedback.distance_remaining > 0 && x > 15 && !done && is_elevator_goal)
         {
             x = 0;
             done = true;
@@ -207,7 +209,7 @@ private:
             
             
         }
-        else if (feedback->feedback.distance_remaining < 0.1 && feedback->feedback.distance_remaining > 0 && x > 15 && !done)
+        else if (feedback->feedback.distance_remaining < 0.2 && feedback->feedback.distance_remaining > 0 && x > 15 && !done)
         {   
             x = 0;    
             done = true;
@@ -299,7 +301,7 @@ private:
 
     void loadFloorMapConfig()
     {
-        std::string maps_dir = "/home/crabbycat/ros2_ws/src/tarkbot_robot/maps/BlkD/";
+        std::string maps_dir = "/home/ros2_ws/src/tarkbot_robot/maps/BlkD/";
         std::regex floor_regex("Floor(\\d+)_.*\\.yaml");
         elevator_arrived_ = false;
         RCLCPP_INFO(this->get_logger(), "Loading floor map configuration from directory: %s", maps_dir.c_str());
