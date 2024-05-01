@@ -1,12 +1,12 @@
 # Autonomous Multi-Floor Robot
 
-This repository contains all the packages for my final year project at the University of Nottingham. The aim was to develop an AGV capable of navigating in a multi-floor building using elevators to go between floors. The image below shows the robot used for this. Its equipt with a Jetson Nano (running ROS 2 in a Docker container) along with an RPLidar A2M4. 
+This repository contains all the packages for my final year project at the University of Nottingham. The aim was to develop an AGV capable of navigating in a multi-floor building using elevators to go between floors. The image below shows the robot used for this. It's equipt with a Jetson Nano (running ROS 2 in a Docker container) and an RPLidar A2M4. The package named "multi_floor_navigator" in the src directory enables a custom behaviour necessary for going between floors using an elevator in combination with ROS 2's navigation stack, Nav2 for autonomous navigation. 
 
 
 
 
-![image](https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827)
 
+<img src="https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827" width=50% height=50%>
 
 
 
