@@ -6,7 +6,7 @@ This repository contains all the packages for my final year project at the Unive
 
 
 
-<img src="https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827" width=50% height=50%>
+<img src="https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827" align="center" width=50% height=50% >
 
 
 
