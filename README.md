@@ -1,19 +1,28 @@
 # Autonomous Multi-Floor Robot
 
-This repository contains all the packages for my final year project at the University of Nottingham. The aim was to develop an AGV capable of navigating in a multi-floor building using elevators to go between floors. The image below shows the robot used for this. It's equipt with a Jetson Nano (running ROS 2 in a Docker container) and an RPLidar A2M4. The package named "multi_floor_navigator" in the src directory enables a custom behaviour necessary for going between floors using an elevator in combination with ROS 2's navigation stack, Nav2 for autonomous navigation. 
+This repository contains all the packages for my final year project at the University of Nottingham. The aim was to develop an AGV capable of navigating in a multi-floor building using elevators to go between floors. The image below shows the robot used for this. It's equipt with a Jetson Nano (running ROS 2 in a Docker container) and an RPLidar A2M4. The package named "multi_floor_navigator" in the src directory enables a custom behaviour necessary for going between floors using an elevator in combination with ROS 2's navigation stack, Nav2 for autonomous navigation. This is not a step but step guide on how to set it up. I might write that later. 
+***
+
+#### Some other packages include:
+1. tarkbot_robot: Driver for the base. To allow controlling it using ROS Topics.
+2. rplidar_ros  : Driver for the lidar. To allow controlling it using ROS Topics.
+3. turtlebot4*  : Contains files which I used to speed up testing of simulations using turtlebot4's already set-up files.
+
+***
+
+<p align=center>
+<img  width=50% height=50% src="https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827" >
+</p>
 
 
 
+## Important commands
 
+#### Run Docker
+```docker run -t -i --privileged -v /dev:/dev --net=host 415cdcab3289 bash```
 
-<img src="https://github.com/CraftyCranberry/ros2_ws/assets/82392157/25ea1176-7634-4310-911b-06e8e2ddb827" align="center" width=50% height=50% >
+#### Call Map
+```ros2 service call /map_server/load_map nav2_msgs/srv/LoadMap "{map_url: /home/ros2_ws/src/tarkbot_robot/maps/BlkD/BlkD_Floor1_V2.yaml}"```
 
-
-
-
-## Important command to launch docker with usb and net host
-docker run -t -i --privileged -v /dev:/dev --net=host 415cdcab3289 bash
-
-
-calling map:
-ros2 service call /map_server/load_map nav2_msgs/srv/LoadMap "{map_url: /home/ros2_ws/src/tarkbot_robot/maps/BlkD/BlkD_Floor1_V2.yaml}"
+#### Send goal
+```ros2 topic pub /goal_pose geometry_msgs/Pose "{position: {x: 2.0, y: 3.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}" ```
