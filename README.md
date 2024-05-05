@@ -26,3 +26,7 @@ This repository contains all the packages for my final year project at the Unive
 
 #### Send goal
 ```ros2 topic pub /goal_pose geometry_msgs/Pose "{position: {x: 2.0, y: 3.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}" ```
+
+
+### Important Note:
+If you go over the source code of the multi-floor node you may notice I have defined some things like the path to the maps folder or the co-ordinates of the elevator inside the C++ file. This is definitely not ideal and not how I would go about on production-level or final software. I only did this to save time as I was running close to the deadline trying to get it to work. I will definitely try to convert those over to values that can be defined in a parameter (.yaml) file when I get some time in future. 
