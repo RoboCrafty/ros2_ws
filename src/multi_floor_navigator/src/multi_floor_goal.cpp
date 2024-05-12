@@ -182,7 +182,7 @@ private:
         x= x+1;
         last_feedback_distance_remaining_ = feedback->feedback.distance_remaining;
         // RCLCPP_INFO(this->get_logger(), "feedback from navigate to pose: %f, Value of x: %d, value of done: %i, value of is elv goal: %i", feedback->feedback.distance_remaining, x, done, is_elevator_goal);
-        if (feedback->feedback.distance_remaining < 0.2 && feedback->feedback.distance_remaining > 0 && x > 15 && !done && is_elevator_goal)
+        if (feedback->feedback.distance_remaining < 0.5 && feedback->feedback.distance_remaining > 0 && x > 10 && !done && is_elevator_goal)
         {
             x = 0;
             done = true;
@@ -209,7 +209,7 @@ private:
             
             
         }
-        else if (feedback->feedback.distance_remaining < 0.2 && feedback->feedback.distance_remaining > 0 && x > 15 && !done)
+        else if (feedback->feedback.distance_remaining < 0.5 && feedback->feedback.distance_remaining > 0 && x > 10 && !done)
         {   
             x = 0;    
             done = true;
