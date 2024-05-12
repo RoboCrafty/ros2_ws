@@ -25,7 +25,7 @@ This repository contains all the packages for my final year project at the Unive
 ```ros2 service call /map_server/load_map nav2_msgs/srv/LoadMap "{map_url: /home/ros2_ws/src/tarkbot_robot/maps/BlkD/BlkD_Floor1_V2.yaml}"```
 
 #### Send goal
-```ros2 topic pub /goal_pose geometry_msgs/Pose "{position: {x: 2.0, y: 3.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}" ```
+```ros2 topic pub --once /user_goal geometry_msgs/Pose "{position: {x: 4.0, y: -3.0, z: 0.0}, orientation: {x: 0.0, y: 0.0, z: 0.0, w: 1.0}}" ```
 
 
 ### Important Note:
