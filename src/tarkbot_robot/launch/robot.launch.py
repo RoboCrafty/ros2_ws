@@ -12,6 +12,7 @@ from launch.actions import DeclareLaunchArgument,ExecuteProcess,IncludeLaunchDes
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
+from launch_xml.launch_description_sources import XMLLaunchDescriptionSource
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -72,6 +73,11 @@ def generate_launch_description():
     bringup_nav = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','navigation_launch.py')),                
     )      
+
+
+    bringup_foxglove = IncludeLaunchDescription(
+        XMLLaunchDescriptionSource(os.path.join(get_package_share_directory(('foxglove_bridge')),'launch','foxglove_bridge_launch.xml')),                
+    )   
 #     bringup_robot_desc = IncludeLaunchDescription(
 #         PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'description.launch.py']),
 #         launch_arguments={
@@ -88,6 +94,7 @@ def generate_launch_description():
     ld.add_action(bringup_rplidar)
     ld.add_action(bringup_amcl)
     ld.add_action(bringup_nav)
+    ld.add_action(bringup_foxglove)
     return ld
 
 

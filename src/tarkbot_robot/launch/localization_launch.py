@@ -75,8 +75,8 @@ def generate_launch_description():
 
     declare_map_yaml_cmd = DeclareLaunchArgument(
         'map',
-        # default_value=os.path.join(bringup_dir, 'maps', 'BlkD', 'BlkD_Floor1_V2.yaml'),
-        default_value=os.path.join(bringup_dir, 'maps', 'SimFloor1_V1.yaml'),
+        default_value=os.path.join(bringup_dir, 'maps', 'BlkD', 'BlkD_Floor0_V3.yaml'),
+        # default_value=os.path.join(bringup_dir, 'maps', 'SimFloor1_V1.yaml'),
         description='Full path to map yaml file to load')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
