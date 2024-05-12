@@ -64,6 +64,14 @@ def generate_launch_description():
                 'urdf_package_path': PathJoinSubstitution(['urdf', 'tarkbot_model_v4.urdf'])}.items()
                 
     )      
+
+    bringup_amcl = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','localization_launch.py')),
+    )      
+
+    bringup_nav = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(get_package_share_directory(('tarkbot_robot')),'launch','navigation_launch.py')),                
+    )      
 #     bringup_robot_desc = IncludeLaunchDescription(
 #         PathJoinSubstitution([FindPackageShare('urdf_launch'), 'launch', 'description.launch.py']),
 #         launch_arguments={
@@ -78,7 +86,8 @@ def generate_launch_description():
     ld.add_action(bringup_robot_desc)
     ld.add_action(joint_pub)
     ld.add_action(bringup_rplidar)
-
+    ld.add_action(bringup_amcl)
+    ld.add_action(bringup_nav)
     return ld
 
 
